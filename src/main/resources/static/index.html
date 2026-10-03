@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Register Tester</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            max-width: 450px;
+            margin: auto;
+        }
+        input, select, button {
+            display: block;
+            margin: 10px 0;
+            padding: 8px;
+            width: 100%;
+        }
+        #response {
+            margin-top: 20px;
+            padding: 10px;
+            background: #f4f4f4;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+
+<h2>Register</h2>
+<a href="/oauth2/authorization/google">Login with Google</a>
+
+<input id="name" placeholder="Name">
+<input id="address" placeholder="Address">
+<input id="email" placeholder="Email">
+<input id="phone" placeholder="Phone Number">
+<input id="password" type="password" placeholder="Password">
+<input id="storeName" placeholder="Store Name">
+<input id="role" placeholder="Role">
+
+<select id="authorizedBy">
+    <option value="GOOGLE">GOOGLE</option>
+    <option value="SELF">SELF</option>
+</select>
+
+<button onclick="register()">Register</button>
+
+<div id="response"></div>
+
+<script>
+    const baseUrl = "http://localhost:8080";
+
+    function showResponse(data) {
+        document.getElementById("response").textContent =
+            typeof data === "string" ? data : JSON.stringify(data, null, 2);
+    }
+
+    async function register() {
+        const body = {
+            name: document.getElementById("name").value,
+            address: document.getElementById("address").value,
+            email: document.getElementById("email").value,
+            phoneNumber: document.getElementById("phone").value,
+            password: document.getElementById("password").value,
+            storeName: document.getElementById("storeName").value,
+            role: document.getElementById("role").value,
+            authorizedBy: document.getElementById("authorizedBy").value
+        };
+
+        try {
+            const res = await fetch(`${baseUrl}/auth/register`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Accept": "*/*"
+                },
+                body: JSON.stringify(body)
+            });
+
+            const data = await res.json();
+            showResponse(data);
+        } catch (err) {
+            showResponse("Error: " + err);
+        }
+    }
+</script>
+
+</body>
+</html>

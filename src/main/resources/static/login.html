@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login - Generate Token</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            max-width: 450px;
+            margin: auto;
+        }
+        input, button {
+            display: block;
+            margin: 10px 0;
+            padding: 8px;
+            width: 100%;
+        }
+        #response {
+            margin-top: 20px;
+            padding: 10px;
+            background: #f4f4f4;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+
+<h2>Login</h2>
+
+<input id="username" placeholder="Username">
+<input id="password" type="password" placeholder="Password">
+
+<button onclick="login()">Login</button>
+
+<div id="response"></div>
+
+<script>
+    const baseUrl = "http://localhost:8080";
+
+    function show(msg) {
+        document.getElementById("response").textContent = msg;
+    }
+
+    async function login() {
+        const body = {
+            username: document.getElementById("username").value,
+            password: document.getElementById("password").value
+        };
+
+        try {
+            const res = await fetch(`${baseUrl}/auth/generateToken`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Accept": "*/*"
+                },
+                body: JSON.stringify(body)
+            });
+
+            if (!res.ok) {
+                const err = await res.text();
+                show(`Error ${res.status}: ${err}`);
+                return;
+            }
+
+            // Parse JSON response
+            const json = await res.json();
+
+            // Extract the token field
+            const token = json.token;
+
+            if (!token) {
+                show("No token returned by server.");
+                return;
+            }
+
+            // Save token in localStorage
+            localStorage.setItem("authToken", token);
+
+            show("Token Generated & Saved:\n\n" + token);
+
+        } catch (err) {
+            show("Network error: " + err);
+        }
+    }
+</script>
+
+</body>
+</html>
